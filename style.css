@@ -3,8 +3,20 @@ body {
     font-family: sans-serif;
 }
 
+#root {
+    min-width: 100vw;
+    min-height: 100vh;
+}
+
+#bottom {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f0f0f0;
+
+
 #chat-container {
-    width: 80%;
+    min-width: 100%;
     margin: 0 auto;
     border: 1px solid #ccc;
     padding: 10px;
@@ -29,6 +41,32 @@ body {
     padding: 5px;
 }
 
-#voice-input-button, #send-button {
-    padding: 5px 10px;
+.input-group {
+	justify-content: center;
+}
+
+#mic-button, #ai-button {
+    border-radius: 50%;
+    margin : 5px;
+    width: 100px;
+    height: 100px;
+}
+
+.sender {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.message-container {
+    margin: 2px;
+    padding: 2px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+}
+
+.button-icon {
+    display: block;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
