@@ -1,4 +1,7 @@
-/* style.css */
+:root {
+    --footer-height: 170px;
+}
+
 body {
     font-family: sans-serif;
 }
@@ -8,31 +11,26 @@ body {
     min-height: 100vh;
 }
 
+#top {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
 #bottom {
     position: fixed;
     bottom: 0;
     width: 100%;
+    height: var(--footer-height);
     background-color: #f0f0f0;
+}
 
-
-#chat-container {
+#chat-frame {
     min-width: 100%;
-    margin: 0 auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-}
-
-#chat-messages {
-    height: 300px;
+    height: calc(100vh - var(--footer-height));
+    margin: 0;
     overflow-y: scroll;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-}
-
-#chat-input {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
+    padding: 10px;
 }
 
 #message-input {
@@ -44,14 +42,6 @@ body {
 .input-group {
 	justify-content: center;
 }
-
-#mic-button, #ai-button {
-    border-radius: 50%;
-    margin : 5px;
-    width: 100px;
-    height: 100px;
-}
-
 .sender {
     font-weight: bold;
     margin-right: 5px;
@@ -69,4 +59,18 @@ body {
     width: 80%;
     margin-left: auto;
     margin-right: auto;
+}
+
+#mic-button, #ai-button {
+    border-radius: 50%;
+    margin : 10px;
+    width: 100px;
+    height: 100px;
+}
+
+#settings-button {
+    border-radius: 50%;
+    margin : 10px;
+    width: 70px;
+    height: 70px;
 }

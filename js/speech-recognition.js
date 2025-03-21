@@ -1,5 +1,6 @@
 const micButton = document.getElementById('mic-button');
 const micButtonImage = document.getElementById('mic-button-image');
+const messageToast = document.getElementById('message-torst');
 
 const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
 recognition.lang = 'ja-JP';
@@ -13,7 +14,7 @@ micButton.addEventListener('click', () => {
     isListening = !isListening;
     UpdateLLMStatus(isListening);
 });
-function UpdateLLMStatus(isListeningFlag){
+function UpdateLLMStatus(isListeningFlag) {
     if (isListeningFlag) {
         micButton.classList.remove('btn-secondary');
         micButton.classList.add('btn-primary');
@@ -50,16 +51,15 @@ recognition.onend = () => {
 
 // エラーハンドリング
 recognition.onerror = (event) => {
-
     if (event.error === 'no-speech' ||
         event.error === 'bad-grammar') {
             if (isListening) recognition.start();
     }
     else {
-        console.error('音声認識エラー:', event.error);
-        // TODO : トーストでエラーメッセージを表示する
-
         isListening = false;
         UpdateListeningStatus(false);
+        //console.error('音声認識エラー: ', event.error);
+
+        // TODO : トーストでエラーメッセージを表示する
     }
 };

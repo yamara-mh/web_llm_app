@@ -1,4 +1,4 @@
-const chatMessages = document.getElementById('chat-messages');
+const chatFrame = document.getElementById('chat-frame');
 const messageInput = document.getElementById('message-input');
 
 
@@ -18,21 +18,6 @@ function addMessage(sender, message) {
         messageContainer.appendChild(p);
     }
 
-    chatMessages.appendChild(messageContainer);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // 最新のメッセージが表示されるようにスクロール
-}
-
-// スクロールイベントの監視
-chatMessages.addEventListener('scroll', () => {
-
-});
-
-// LLMの応答をシミュレートする関数 (仮)
-async function getLLMResponse(message) {
-    // ここでLLM APIを呼び出す代わりに、仮の応答を返す
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve(`「${message}」についてですね。`);
-        }, 1000);
-    });
+    chatFrame.appendChild(messageContainer);
+    chatFrame.scrollTop = chatFrame.scrollHeight; // 最新のメッセージが表示されるようにスクロール
 }
