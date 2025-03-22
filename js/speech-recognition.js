@@ -1,6 +1,6 @@
 const micButton = document.getElementById('mic-button');
 const micButtonImage = document.getElementById('mic-button-image');
-const messageToast = document.getElementById('message-torst');
+const messageToast = document.getElementById('message-toast');
 
 const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
 recognition.lang = 'ja-JP';
@@ -58,8 +58,7 @@ recognition.onerror = (event) => {
     else {
         isListening = false;
         UpdateListeningStatus(false);
-        //console.error('音声認識エラー: ', event.error);
-
-        // TODO : トーストでエラーメッセージを表示する
+        // console.error('音声認識エラー: ', event.error);
+        // TODO: messageToast でエラーメッセージを表示する
     }
 };

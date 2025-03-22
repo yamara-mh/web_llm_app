@@ -28,12 +28,85 @@
         </div>
     </div>
 
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    // TODO: settings.html に下記の設定モーダルを移す
+    <div id="settings-modal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">設定</h5>
+                </div>
+                <div class="modal-body">
+                    <!--
+                    TODO: 以下の設定項目を追加
+                    - 最新版のモデルを使う　トグルボタン
+                    スライダーに関して、以下の修正を行う
+                    - スライダーのlabelの右に太字で現在の値を表示
+                    - スライダーの左右に最大値と最小値を表示
+                    -->
+                    <h5>モデル</h5>
+                    <div class="mb-3">
+                        <label for="model-select" class="form-label">利用するGeminiモデル</label>
+                        <select id="model-select" class="form-select"> // llms.js の models から選択できるようにする
+                            <option value="gemini-pro">Gemini Pro</option>
+                            <option value="gemini-ultra">Gemini Ultra</option>
+
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="api-key-input" class="form-label">Gemini API キー</label>
+                        <input type="text" id="api-key-input" class="form-control" placeholder="APIキーを入力">
+                    </div>
+                    <div class="mb-3">
+                        <label for="prompt-textarea" class="form-label">プロンプト</label>
+                        <textarea id="prompt-textarea" class="form-control" rows="5" placeholder="プロンプトを入力"></textarea>
+                    </div>
+
+                    <h5>UX</h5>
+                    <div class="mb-3">
+                        <label for="font-size-slider" class="form-label">文字サイズ</label>
+                        <input type="range" id="font-size-slider" class="form-range" min="12" max="24" step="1" value="16">
+                    </div>
+
+                    <h5>音声</h5>
+                    <div class="mb-3">
+                        <label for="speech-language-select" class="form-label">言語</label>
+                        <select id="speech-language-select" class="form-select">
+                            <option value="ja-JP">日本語</option>
+                            <option value="en-US">English (US)</option>
+                            
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="speech-speed-slider" class="form-label">速度</label>
+                        <input type="range" id="speech-speed-slider" class="form-range" min="0.1" max="10" step="0.1" value="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="speech-pitch-slider" class="form-label">高さ</label>
+                        <input type="range" id="speech-pitch-slider" class="form-range" min="0" max="2" step="0.1" value="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="speech-volume-slider" class="form-label">音量</label>
+                        <input type="range" id="speech-volume-slider" class="form-range" min="0" max="1" step="0.1" value="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="キャンセル">キャンセル</button>
+                    
+                    <button type="button" id="save-settings-button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="保存">保存して適応</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="message-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-body">
             ここにエラーメッセージなどを表示
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="閉じる"></button>
         </div>
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script src="js/chat.js"></script>

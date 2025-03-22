@@ -21,3 +21,10 @@ function addMessage(sender, message) {
     chatFrame.appendChild(messageContainer);
     chatFrame.scrollTop = chatFrame.scrollHeight; // 最新のメッセージが表示されるようにスクロール
 }
+
+const settingsButton = document.getElementById('settings-button');
+const settingsModal = new bootstrap.Modal(document.getElementById('settings-modal'));
+
+settingsButton.addEventListener('click', () => {
+  settingsModal.toggle();
+});
