@@ -1,4 +1,5 @@
-// 設定を保存・適用する処理
+const settingsButton = document.getElementById('settings-button');
+const settingsModal = new bootstrap.Modal(document.getElementById('settings-modal'));
 
 // 保存された設定を読み込んで適用する関数
 function loadSettings() {
@@ -81,3 +82,7 @@ document.getElementById('save-settings-button').addEventListener('click', () => 
 
 // ページ読み込み時に設定を適用
 loadSettings();
+
+settingsButton.addEventListener('click', () => {
+    settingsModal.toggle();
+});
