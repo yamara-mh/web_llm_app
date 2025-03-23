@@ -12,9 +12,9 @@ isListening = false;
 
 micButton.addEventListener('click', () => {
     isListening = !isListening;
-    UpdateLLMStatus(isListening);
+    updateLLMStatus(isListening);
 });
-function UpdateLLMStatus(isListeningFlag) {
+function updateLLMStatus(isListeningFlag) {
     if (isListeningFlag) {
         micButton.classList.remove('btn-secondary');
         micButton.classList.add('btn-primary');

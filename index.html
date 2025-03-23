@@ -28,77 +28,91 @@
         </div>
     </div>
 
-    // TODO: settings.html に下記の設定モーダルを移す
     <div id="settings-modal" class="modal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">設定</h5>
+                    <h2 class="modal-title">設定</h2>
                 </div>
                 <div class="modal-body">
-                    <!--
-                    TODO: 以下の設定項目を追加
-                    - 最新版のモデルを使う　トグルボタン
-                    スライダーに関して、以下の修正を行う
-                    - スライダーのlabelの右に太字で現在の値を表示
-                    - スライダーの左右に最大値と最小値を表示
-                    -->
-                    <h5>モデル</h5>
+                    <h4>言語モデル</h4>
                     <div class="mb-3">
-                        <label for="model-select" class="form-label">利用するGeminiモデル</label>
-                        <select id="model-select" class="form-select"> // llms.js の models から選択できるようにする
-                            <option value="gemini-pro">Gemini Pro</option>
-                            <option value="gemini-ultra">Gemini Ultra</option>
-
-                        </select>
+                        <label for="model-select" class="form-label">利用する言語モデル</label>
+                        <select id="model-select" class="form-select"></select>
+                    </div>
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="latest-model-checkbox">
+                        <label class="form-check-label" for="latest-model-checkbox">最新版を優先して利用する</label>
                     </div>
                     <div class="mb-3">
                         <label for="api-key-input" class="form-label">Gemini API キー</label>
                         <input type="text" id="api-key-input" class="form-control" placeholder="APIキーを入力">
                     </div>
-                    <div class="mb-3">
-                        <label for="prompt-textarea" class="form-label">プロンプト</label>
-                        <textarea id="prompt-textarea" class="form-control" rows="5" placeholder="プロンプトを入力"></textarea>
-                    </div>
 
-                    <h5>UX</h5>
+                    <h4 class="border-top">UI</h4>
                     <div class="mb-3">
                         <label for="font-size-slider" class="form-label">文字サイズ</label>
-                        <input type="range" id="font-size-slider" class="form-range" min="12" max="24" step="1" value="16">
+                        <div class="slider-container">
+                            <p class="slider-minmax-label" style="font-size: 16px;">A</p>
+                            <input type="range" id="font-size-slider" class="form-range" min="16" max="40"  step="2" value="20">
+                            <p class="slider-minmax-label" style="font-size: 40px;">A</p>
+                        </div>
                     </div>
-
-                    <h5>音声</h5>
                     <div class="mb-3">
-                        <label for="speech-language-select" class="form-label">言語</label>
+                        <label for="speech-language-select" class="form-label">聞き取り言語</label>
                         <select id="speech-language-select" class="form-select">
                             <option value="ja-JP">日本語</option>
                             <option value="en-US">English (US)</option>
-                            
+                        </select>
+                    </div>
+                
+                    <h4 class="border-top">音声</h4>
+                    <div class="mb-3">
+                        <label for="voice-select" class="form-label">声の種類</label>
+                        <select id="voice-select" class="form-select">
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="speech-speed-slider" class="form-label">速度</label>
-                        <input type="range" id="speech-speed-slider" class="form-range" min="0.1" max="10" step="0.1" value="1">
+                        <div class="slider-container">
+                            <label for="speech-speed-slider" class="settings-slider-label">速度</label>
+                            <label id="speech-speed-value" for="speech-speed-slider"    class="settings-slider-value-label"></label>
+                        </div>
+                        <div class="slider-container">
+                            <p class="slider-minmax-label">0.1</p>
+                            <input type="range" id="speech-speed-slider" class="form-range" min="0.1" max="10"  step="0.1" value="1">
+                            <p class="slider-minmax-label">10.0</p>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="speech-pitch-slider" class="form-label">高さ</label>
-                        <input type="range" id="speech-pitch-slider" class="form-range" min="0" max="2" step="0.1" value="1">
+                        <div class="slider-container">
+                            <label for="speech-pitch-slider" class="settings-slider-label">高さ</label>
+                            <label id="speech-pitch-value" for="speech-pitch-slider"    class="settings-slider-value-label"></label>
+                        </div>
+                        <div class="slider-container">
+                            <p class="slider-minmax-label">0.0</p>
+                            <input type="range" id="speech-pitch-slider" class="form-range" min="0" max="2"     step="0.1" value="1">
+                            <p class="slider-minmax-label">2.0</p>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="speech-volume-slider" class="form-label">音量</label>
-                        <input type="range" id="speech-volume-slider" class="form-range" min="0" max="1" step="0.1" value="1">
-                    </div>
+                        <div class="slider-container">
+                            <label for="speech-volume-slider" class="settings-slider-label">音量</label>
+                            <label id="speech-volume-value" for="speech-volume-slider"  class="settings-slider-value-label"></label>
+                        </div>
+                        <div class="slider-container">
+                            <p class="slider-minmax-label">0.0</p>
+                            <input type="range" id="speech-volume-slider" class="form-range" min="0" max="1"    step="0.1" value="1">
+                            <p class="slider-minmax-label">1.0</p>
+                        </div>
                 </div>
-                <div class="modal-footer">
-                    
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="キャンセル">キャンセル</button>
-                    
-                    <button type="button" id="save-settings-button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="保存">保存して適応</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="キャンセル">キャンセル</button>
+                
+                <button type="button" id="save-settings-button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="保存">保存して適応</button>
             </div>
         </div>
     </div>
-
 
     <div id="message-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-body">
@@ -109,10 +123,10 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-    <script src="js/settings.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/speech-recognition.js"></script>
     <script src="js/llm.js"></script>
     <script src="js/speak.js"></script>
+    <script src="js/settings.js"></script>
 </body>
 </html>

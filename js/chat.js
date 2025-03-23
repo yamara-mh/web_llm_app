@@ -2,9 +2,8 @@ const chatFrame = document.getElementById('chat-frame');
 const messageInput = document.getElementById('message-input');
 
 
-// チャットメッセージを追加する関数
 function addMessage(sender, message) {
-    const messageContainer = document.createElement('div'); // 各メッセージを囲むdiv
+    const messageContainer = document.createElement('div');
     messageContainer.classList.add('message-container');
 
     const senderElement = document.createElement('span');
