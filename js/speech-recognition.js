@@ -36,10 +36,8 @@ recognition.onresult = (event) => {
     
     const transcript = currentResult[0].transcript;
     messageInput.value = transcript;
-
-    console.log(currentResult);
     
-    if (currentResult.isFinal) {
+    if (currentResult.isFinal && transcript.length > 0) {
         addMessage('ユーザ', transcript);
         messageInput.value = '';
     }
