@@ -19,8 +19,7 @@ models.forEach(model => {
     const option = document.createElement('option');
     option.value = model;
     option.textContent = model;
-    document.getElementById('model-select').appendChild(option);
-    
+    document.getElementById('model-select').appendChild(option);    
 });
 
 // UI
@@ -46,6 +45,7 @@ function populateVoiceList() {
 if (synthesis.onvoiceschanged !== undefined) {
     synthesis.onvoiceschanged = populateVoiceList;
 }
+populateVoiceList()
 
 // 音声
 speechSpeedSlider.addEventListener('input', () => {
