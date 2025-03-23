@@ -26,28 +26,29 @@ models.forEach(model => {
 fontSizeSlider.addEventListener('input', () => {
     document.getElementById('font-size-value').textContent = Number(fontSizeSlider.value).toFixed(1);
 });
+
+// 音声
 function populateVoiceList() {
     const voices = synthesis.getVoices();
+    const savedIndex = localStorage.getItem('voiceIndex');
+    if (savedIndex === null) savedIndex = voices.indexOf(voices.find(voice => voice.lang === window.navigator.browserLanguage));
+    else savedIndex = 0;
 
     for (let i = 0; i < voices.length; i++) {
         const option = document.createElement('option');
-        option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
-    
-        if (voices[i].default) option.textContent += ' -- DEFAULT';
-    
+        option.textContent = voices[i].name + ' (' + voices[i].lang + ')';    
         option.setAttribute('data-lang', voices[i].lang);
         option.setAttribute('data-name', voices[i].name);
         const voiceSelect = document.getElementById('voice-select');
         voiceSelect.appendChild(option);
     }
-    speakVoiceSelect.selectedIndex = localStorage.getItem('voiceIndex');
+    speakVoiceSelect.selectedIndex = savedIndex;
 }
 if (synthesis.onvoiceschanged !== undefined) {
     synthesis.onvoiceschanged = populateVoiceList;
 }
 populateVoiceList()
 
-// 音声
 speechSpeedSlider.addEventListener('input', () => {
     document.getElementById('speech-speed-value').textContent = Number(speechSpeedSlider.value).toFixed(1);
 });
