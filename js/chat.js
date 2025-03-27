@@ -2,7 +2,7 @@ import { tryThink } from './llm.js';
 
 const chatFrame = document.getElementById('chat-frame');
 
-export function addMessage(sender, message, ) {
+export function addMessage(sender, message) {
     const messageContainer = document.createElement('div');
     messageContainer.classList.add('message-container');
 
@@ -11,7 +11,7 @@ export function addMessage(sender, message, ) {
     senderElement.classList.add('sender');
     messageContainer.appendChild(senderElement);
 
-    if (message.trim() !== '') {
+    if (message !== '') {
         const p = document.createElement('div');
         p.textContent = message;
         messageContainer.appendChild(p);

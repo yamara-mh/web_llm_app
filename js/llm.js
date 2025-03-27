@@ -6,42 +6,44 @@ const aiButtonImage = document.getElementById('ai-button-image');
 var isActivatedLLM = false;
 var history;
 
-// スキーマ定義は変更なし
 const schema = {
-    situation: {
-        type: SchemaType.STRING,
-        description: '会話の状況',
-        nullable: false,
+    type: SchemaType.OBJECT,
+    properties: {
+        考察: {
+            type: SchemaType.STRING,
+            // description: '会話から読み取れる情報の考察、推理',
+            nullable: false,
+        },
+        誰に: {
+            type: SchemaType.STRING,
+            // description: '発言が誰に向けられたか',
+            enum: ['null', '話者自身', '物や動物など', '誰か', '{#あなた}かも', '{#あなた}'],
+            nullable: false,
+        },
+        何を: {
+            type: SchemaType.STRING,
+            // description: '発言の内容',
+            enum: ['ひとりごと', '擬人語り', '日常会話', '議論', '相談', '質問'],
+            nullable: false,
+        },
+        方針: {
+            type: SchemaType.STRING,
+            // description: 'AIの発話方針',
+            nullable: true,
+        },
+        発話: {
+            type: SchemaType.STRING,
+            // description: 'AIの実際の応答発話',
+            nullable: true,
+        },
+        区分: {
+            type: SchemaType.STRING,
+            // description: 'AIの発話の区分',
+            enum: ['共感', '雑談', '補足', '助言', '重要', '警告'],
+            nullable: true,
+        },
     },
-    who: {
-        type: SchemaType.STRING,
-        description: '誰に言った?',
-        nullable: false,
-        enum: ['null', '話者自身', '物や動物など', '誰か', '{#あなた}'],
-    },
-    what: {
-        type: SchemaType.STRING,
-        description: '何を話した?',
-        nullable: false,
-        enum: ['ひとりごと', '擬人語り', '日常会話', '議論', '相談', '質問'],
-    },
-    plan: {
-        type: SchemaType.STRING,
-        description: '発言方針',
-        nullable: true,
-    },
-    talk: {
-        type: SchemaType.STRING,
-        description: '発言',
-        nullable: true,
-    },
-    category: {
-        type: SchemaType.STRING,
-        description: '発言のカテゴリ',
-        enum: ['共感', '雑談', '補足', '助言', '重要', '警告'],
-        nullable: true,
-    },
-    required: ['situation', 'who', 'what', 'plan', 'talk', 'category'],
+    required: ['考察', '誰に', '何を']
 };
 
 
@@ -89,15 +91,21 @@ async function getCompletion(message) {
     const latestSuffix = localStorage.getItem('latestModel') === '1' ? '-latest' : '';
     const apiKey = localStorage.getItem('apiKey');
 
+    // APIキーが設定されていない場合のチェックを追加
+    if (!apiKey || apiKey.length < 32) {
+        console.error("有効なAPIキーが設定されていません。");
+        alert("有効なAPIキーが設定されていません。設定画面でAPIキーを入力してください。");
+        updateListeningStatus(false);
+        return null;
+    }
+
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        // history は generateContent の第2引数で渡すか、ChatSession を使う
         model: geminiModel + latestSuffix,
-        // generationConfig は getGenerativeModel の第2引数で渡す
-        // generationConfig: {
-        //     responseMimeType: 'application/json', // JSONモードを使う場合は設定
-        //     responseSchema: schema,             // JSONモードでスキーマを使う場合
-        // },
+        generationConfig: {
+            responseMimeType: 'application/json',
+            responseSchema: schema, // 定義したスキーマを使用
+        },
     });
 
     // プロンプトとメッセージを結合
@@ -127,7 +135,7 @@ async function getCompletion(message) {
         if (error.message && error.message.includes('404')) {
             alert(`モデルが見つかりません (${geminiModel + latestSuffix})。設定画面でモデル名を確認するか、APIキーが有効か確認してください。`);
         } else if (error.message && error.message.includes('API key not valid')) {
-             alert("APIキーが無効です。設定画面で正しいAPIキーを入力してください。");
+            alert("APIキーが無効です。設定画面で正しいAPIキーを入力してください。");
         }
         return null;
     }
@@ -153,50 +161,27 @@ function resultProcessing(response) {
     }
 }
 
-const prompt = "{#あなた}はAI音声アシスタント。名前は{#モニター}"
+const prompt = "{#あなた}はAI音声アシスタント/n"
++ "{#あなた}の名前は{#モニター}\n"
 + "\n"
-+ "会話から読み取れる情報を水平思考で冷静に必ず{#推理}"
-+ "{#who}に向けた話か次の選択肢から必ず出力"
-+ "0:null"
-+ "1:話者自身"
-+ "2:ペット,電話,テレビなど"
-+ "3:誰か"
-+ "4:{#あなた}"
++ "発言から会話の流れを水平思考で冷静に{#考察}\n"
++ "{#考察}から{#誰に}向けた発言か出力\n"
 + "\n"
-+ "{#何を}話したか次の選択肢から必ず出力"
-+ "0:感嘆詞,間投詞,ひとりごと"
-+ "1:日常会話,自己対話"
-+ "2:雑談"
-+ "3:予想,意見"
-+ "4:相談"
-+ "5:質問"
++ "発言者が{#何を}話しているか出力\n"
 + "\n"
-+ "水平思考で冷静に{#発言}の{#方針}を決定"
-+ "{#何を}に応じた{#方針}の長さ上限"
++ "水平思考で冷静に{#発言}の{#方針}を決定\n"
++ "{#誰に}が3以下なら{#方針}はnull\n"
++ "{#何を}が4以下なら{#方針}はnull\n"
++ "{#何を}に応じた{#方針}の長さ上限\n"
 + "5:100文字"
 + "3:50文字"
 + "\n"
-+ "口調を合わせて端的に{#発言}"
-+ "{#何を}に応じた{#発言}の長さ上限"
++ "口調を合わせて端的に{#発話}\n"
++ "{#誰に}が2以下なら{#発話}はnull\n"
++ "{#何を}が2以下なら{#発話}はnull\n"
++ "{#何を}に応じた{#発話}の長さ上限\n"
 + "5:50文字"
 + "2:25文字"
 + "\n"
-+ "{#発言}の{#区分}を次の選択肢から出力"
-+ "1:相槌"
-+ "2:共感"
-+ "3:雑談"
-+ "4:補足"
-+ "5:助言"
-+ "6:確認"
-+ "7:重要"
-+ "8:警告"
-+ "9:危険"
-+ "\n"
-+ "{#発言}がnullなら{#区分}もnull"
-+ "{#誰に}が3以下なら{#方針}はnull"
-+ "{#何を}が4以下なら{#方針}はnull"
-+ "{#誰に}が2以下なら{#発言}はnull"
-+ "{#何を}が2以下なら{#発言}はnull"
-+ "\n"
-+ "※json形式で出力"
-+ "\n";
++ "{#発話}の{#区分}を出力\n"
++ "{#発話}がnullなら{#区分}もnull\n";
