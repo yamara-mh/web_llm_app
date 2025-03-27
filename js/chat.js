@@ -1,8 +1,8 @@
+import { tryThink } from './llm.js';
+
 const chatFrame = document.getElementById('chat-frame');
-const messageInput = document.getElementById('message-input');
 
-
-function addMessage(sender, message) {
+export function addMessage(sender, message, ) {
     const messageContainer = document.createElement('div');
     messageContainer.classList.add('message-container');
 
@@ -19,4 +19,10 @@ function addMessage(sender, message) {
 
     chatFrame.appendChild(messageContainer);
     chatFrame.scrollTop = chatFrame.scrollHeight; // 最新のメッセージが表示されるようにスクロール
+
+    if (sender === 'user') tryThink(message, llmResult);
+}
+
+const llmResult = function(result) {
+    addMessage('ai', result);
 }

@@ -6,6 +6,13 @@
     <title>AIアシスタントのデモ</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script type="importmap">
+        {
+            "imports": {
+                "@google/generative-ai": "https://esm.run/@google/generative-ai"
+            }
+        }
+    </script>
 </head>
 <body id="root">
     <div id="chat-frame" class="container"></div>
@@ -65,6 +72,17 @@
                             <option value="en-US">English (US)</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <div class="slider-container">
+                            <label for="wait-voice-input-slider" class="settings-slider-label">音声入力待機秒数</label>
+                            <label id="wait-voice-input-value" for="wait-voice-input-slider"    class="settings-slider-value-label"></label>
+                        </div>
+                        <div class="slider-container">
+                            <p class="slider-minmax-label">0.5</p>
+                            <input type="range" id="wait-voice-input-slider" class="form-range" min="0.5" max="2.0"  step="0.1" value="0.8">
+                            <p class="slider-minmax-label">2.0</p>
+                        </div>
+                    </div>
                 
                     <h2 class="border-top">音声</h2>
                     <div class="mb-3">
@@ -90,7 +108,7 @@
                         </div>
                         <div class="slider-container">
                             <p class="slider-minmax-label">0.0</p>
-                            <input type="range" id="speech-pitch-slider" class="form-range" min="0" max="2"     step="0.1" value="1">
+                            <input type="range" id="speech-pitch-slider" class="form-range" min="0" max="2" step="0.1" value="1">
                             <p class="slider-minmax-label">2.0</p>
                         </div>
                     </div>
@@ -123,9 +141,9 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-    <script src="js/chat.js"></script>
-    <script src="js/speech-recognition.js"></script>
-    <script src="js/llm.js"></script>
+    <script type="module" src="js/chat.js"></script>
+    <script type="module" src="js/llm.js"></script>
+    <script type="module" src="js/speech-recognition.js"></script>
     <script src="js/speak.js"></script>
     <script src="js/settings.js"></script>
 </body>

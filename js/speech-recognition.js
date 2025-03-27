@@ -1,14 +1,15 @@
+import { addMessage } from './chat.js';
+
 const micButton = document.getElementById('mic-button');
 const micButtonImage = document.getElementById('mic-button-image');
+const messageInput = document.getElementById('message-input');
 const messageToast = document.getElementById('message-toast');
 
 const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
-recognition.lang = 'ja-JP';
-recognition.continuous = true;
-recognition.interimResults = true;
 
-isListening = false;
-
+var isListening = false;
+var latestUpdateTime = 0;
+var waitVoiceInputSecond;
 
 micButton.addEventListener('click', () => {
     isListening = !isListening;
@@ -19,6 +20,10 @@ function updateLLMStatus(isListeningFlag) {
         micButton.classList.remove('btn-secondary');
         micButton.classList.add('btn-primary');
         micButtonImage.src='images/mic_on_icon.png';
+        
+        recognition.lang = localStorage.getItem('speechLanguage');
+        recognition.continuous = true;
+        recognition.interimResults = true;
         recognition.start();
     }
     else
@@ -37,10 +42,15 @@ recognition.onresult = (event) => {
     const transcript = currentResult[0].transcript;
     messageInput.value = transcript;
     
-    if (currentResult.isFinal && transcript.length > 0) {
-        addMessage('ユーザ', transcript);
+    if (currentResult.isFinal == false || transcript.length == 0) return;
+
+    latestUpdateTime = Date.now();
+    setTimeout(function() {
+        if (latestUpdateTime <= waitVoiceInputSecond) return;
+        
+        addMessage('user', transcript);
         messageInput.value = '';
-    }
+    }, waitVoiceInputSecond);
 };
 
 recognition.onend = () => {
