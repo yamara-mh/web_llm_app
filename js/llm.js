@@ -43,7 +43,8 @@ const schema = {
             nullable: true,
         },
     },
-    required: ['考察', '誰に', '何を']
+    required: ['考察', '誰に', '何を'],
+    propertyOrdering: ['考察', '誰に', '何を', '方針', '発話', '区分'],
 };
 
 
@@ -107,13 +108,11 @@ async function getCompletion(message) {
             responseSchema: schema, // 定義したスキーマを使用
         },
     });
-
-    // プロンプトとメッセージを結合
-    const fullPrompt = prompt + message;
-
+    
     try {
         const result = await model.generateContent({
-            contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            contents: [{ role: "user", parts: [{ text: message }] }],
         });
 
         const response = result.response;
@@ -161,27 +160,10 @@ function resultProcessing(response) {
     }
 }
 
-const prompt = "{#あなた}はAI音声アシスタント/n"
-+ "{#あなた}の名前は{#モニター}\n"
-+ "\n"
-+ "発言から会話の流れを水平思考で冷静に{#考察}\n"
-+ "{#考察}から{#誰に}向けた発言か出力\n"
-+ "\n"
-+ "発言者が{#何を}話しているか出力\n"
-+ "\n"
-+ "水平思考で冷静に{#発言}の{#方針}を決定\n"
-+ "{#誰に}が3以下なら{#方針}はnull\n"
-+ "{#何を}が4以下なら{#方針}はnull\n"
-+ "{#何を}に応じた{#方針}の長さ上限\n"
-+ "5:100文字"
-+ "3:50文字"
-+ "\n"
-+ "口調を合わせて端的に{#発話}\n"
-+ "{#誰に}が2以下なら{#発話}はnull\n"
-+ "{#何を}が2以下なら{#発話}はnull\n"
-+ "{#何を}に応じた{#発話}の長さ上限\n"
-+ "5:50文字"
-+ "2:25文字"
-+ "\n"
-+ "{#発話}の{#区分}を出力\n"
-+ "{#発話}がnullなら{#区分}もnull\n";
+const prompt = "{#あなた}は自律型AIアシスタント\n"
++ "発言の経緯を水平思考で20文字で{#考察}\n"
++ "{#考察}から{#誰に}向けた発言か予想\n"
++ "{#発言内容}を予想\n"
++ "水平思考で簡潔に{#発言}の{#方針}を決定\n"
++ "口調を合わせて簡潔に{#発話}\n"
++ "{#発話}の{#区分}を出力\n";
