@@ -35,7 +35,7 @@ models.forEach(model => {
 
 // UI
 fontSizeSlider.addEventListener('input', () => {
-    document.getElementById('font-size-value').textContent = Number(fontSizeSlider.value).toFixed(1);
+    //document.getElementById('font-size-value').textContent = Number(fontSizeSlider.value).toFixed(1);
 });
 waitVoiceInputSlider.addEventListener('input', () => {
     document.getElementById('wait-voice-input-value').textContent = Number(waitVoiceInputSlider.value).toFixed(1);

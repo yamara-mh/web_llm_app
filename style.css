@@ -68,7 +68,13 @@ body {
     margin: 2px;
     padding: 2px;
     border-radius: 5px;
-    background-color: #f0f0f0;
+    background-color: #eee;
+}
+.message-ai {
+    background-color: #9df;
+}
+.message-error {
+    background-color: #f88;
 }
 
 .button-icon {

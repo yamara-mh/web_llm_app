@@ -6,45 +6,48 @@ const aiButtonImage = document.getElementById('ai-button-image');
 var isActivatedLLM = false;
 var history;
 
+const prompt = "あなたは自律型AIアシスタント。\n"
++ "必ず水平思考で冷静に振る舞う。\n";
+
 const schema = {
     type: SchemaType.OBJECT,
     properties: {
-        考察: {
+        reasoning: {
             type: SchemaType.STRING,
-            // description: '会話から読み取れる情報の考察、推理',
+            description: '発言の経緯を reasoning',
             nullable: false,
         },
-        誰に: {
+        target: {
             type: SchemaType.STRING,
-            // description: '発言が誰に向けられたか',
-            enum: ['null', '話者自身', '物や動物など', '誰か', '{#あなた}かも', '{#あなた}'],
+            description: '話しかけた targetを予想',
+            enum: ['null', '話者自身', '物や動物など', '誰か', 'Geminiかも', '#Gemini'],
             nullable: false,
         },
-        何を: {
+        type: {
             type: SchemaType.STRING,
-            // description: '発言の内容',
-            enum: ['ひとりごと', '擬人語り', '日常会話', '議論', '相談', '質問'],
+            description: '発言の type',
+            enum: ['ひとりごと', '擬人語り', '日常会話', '議論', '相談', '疑問', '質問'],
             nullable: false,
         },
-        方針: {
+        support: {
             type: SchemaType.STRING,
-            // description: 'AIの発話方針',
+            description: '発言に対する responseをGeminiとして思考',
             nullable: true,
         },
-        発話: {
+        response: {
             type: SchemaType.STRING,
-            // description: 'AIの実際の応答発話',
+            description: 'Geminiの簡潔な response',
             nullable: true,
         },
-        区分: {
+        category: {
             type: SchemaType.STRING,
-            // description: 'AIの発話の区分',
+            description: 'Geminiの responseの category',
             enum: ['共感', '雑談', '補足', '助言', '重要', '警告'],
             nullable: true,
         },
     },
-    required: ['考察', '誰に', '何を'],
-    propertyOrdering: ['考察', '誰に', '何を', '方針', '発話', '区分'],
+    required: ['reasoning', 'target', 'type'],
+    propertyOrdering: ['reasoning', 'target', 'type', 'support', 'response', 'category'],
 };
 
 
@@ -66,36 +69,15 @@ function updateListeningStatus(isActivated) {
     }
 }
 
-export async function tryThink(message, callback) {
+export async function tryThink(message, callback, errorCallback) {
     if (isActivatedLLM === false) return;
-    try {
-        const result = await getCompletion(message);
-        // result が null でないことを確認
-        if (result) {
-            callback(resultProcessing(result));
-        } else {
-            console.error("LLMからの応答がありませんでした。");
-            // エラー時のコールバック処理（必要に応じて）
-            // callback(null);
-        }
-    } catch (error) {
-        console.error("tryThink中にエラーが発生しました:", error);
-        // エラー時のコールバック処理（必要に応じて）
-        // callback(null);
-    }
-};
 
-// LLMの応答を取得する関数
-async function getCompletion(message) {
-    console.log("getCompletion");
     const geminiModel = localStorage.getItem('geminiModel');
     const latestSuffix = localStorage.getItem('latestModel') === '1' ? '-latest' : '';
     const apiKey = localStorage.getItem('apiKey');
 
-    // APIキーが設定されていない場合のチェックを追加
     if (!apiKey || apiKey.length < 32) {
-        console.error("有効なAPIキーが設定されていません。");
-        alert("有効なAPIキーが設定されていません。設定画面でAPIキーを入力してください。");
+        errorCallback("有効なAPIキーが設定されていません。設定画面でAPIキーを入力してください。");
         updateListeningStatus(false);
         return null;
     }
@@ -117,53 +99,34 @@ async function getCompletion(message) {
 
         const response = result.response;
         if (!response) {
-            console.error("LLMからの有効なレスポンスがありませんでした。", result);
+            errorCallback("LLMからの有効なレスポンスがありませんでした");
             return null;
         }
 
         console.log("LLM Raw Response:", response);
-        return response;
+        resultProcessing(response, callback, errorCallback);
 
     } catch (error) {
         updateListeningStatus(false);
-        console.error("[GoogleGenerativeAI Error]: Error fetching from API:", error); // エラーログを改善
-        if (error.message) {
-            console.error("Error message:", error.message);
-        }
-        // 404エラーの場合、モデル名が正しいか、APIキーが有効か確認するよう促す
-        if (error.message && error.message.includes('404')) {
-            alert(`モデルが見つかりません (${geminiModel + latestSuffix})。設定画面でモデル名を確認するか、APIキーが有効か確認してください。`);
-        } else if (error.message && error.message.includes('API key not valid')) {
-            alert("APIキーが無効です。設定画面で正しいAPIキーを入力してください。");
-        }
+        errorCallback(error.message);
         return null;
     }
 }
 
-function resultProcessing(response) {
+function resultProcessing(response, callback, errorCallback) {
 
     // history = response.history
-
-    console.log("resultProcessing");
+    console.log("resultProcessing : " + response.history);
 
     try {
         const text = response.text();
-        console.log("LLM Response Text:", text);
         const parsedJson = JSON.parse(text);
         console.log("Parsed JSON:", parsedJson);
-        return parsedJson;
+
+        if (parsedJson.response !== null) callback(parsedJson.response);
 
     } catch (error) {
         updateListeningStatus(false);
-        console.error("JSONのパースまたは結果処理中にエラーが発生しました:", error);
-        return { error: "Failed to process LLM response", details: error.message, rawText: response.text() };
+        errorCallback(error);
     }
 }
-
-const prompt = "{#あなた}は自律型AIアシスタント\n"
-+ "発言の経緯を水平思考で20文字で{#考察}\n"
-+ "{#考察}から{#誰に}向けた発言か予想\n"
-+ "{#発言内容}を予想\n"
-+ "水平思考で簡潔に{#発言}の{#方針}を決定\n"
-+ "口調を合わせて簡潔に{#発話}\n"
-+ "{#発話}の{#区分}を出力\n";
