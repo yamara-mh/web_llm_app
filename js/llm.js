@@ -96,9 +96,17 @@ export async function tryThink(message, callback, errorCallback) {
             maxOutputTokens: 1000,
             temperature: 0, // 創造性（会話の流れで変動するようにする？）
         },
-        // TODO: dynamicRetrievalConfig を利用する
+        tools: [{
+            googleSearchRetrieval: {
+                dynamicRetrievalConfig: {
+                    mode: "MODE_DYNAMIC",
+                    dynamicThreshold: 0.5
+                }
+            }
+        }],
+
     });
-    
+
     try {
         const result = await model.generateContent({ contents:[
             { role: "user", parts: [{ text: message }] },
