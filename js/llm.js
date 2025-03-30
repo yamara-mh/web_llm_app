@@ -1,29 +1,10 @@
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { addErrorMessage } from './chat.js';
 
 const aiButton = document.getElementById('ai-button');
 const aiButtonImage = document.getElementById('ai-button-image');
 
 var isActivatedLLM = false;
-
-const systemInstruction = 'あなたは自律型AIアシスタント\n'
-+ '水平思考で冷静に振る舞う\n'
-* 'JSONで出力\n'
-+ '発言の経緯を簡潔に{#reasoning}\n'
-+ '話しかけた{#target}を次の選択肢から予想\n'
-+ 'null, 話者自身, 物や動物など, 誰か, Geminiかも, #Gemini\n'
-+ '\n'
-+ '発言の{#type}を次の選択肢から予想\n'
-+ 'ひとりごと, 擬人語り, 日常会話, 議論, 相談, 疑問, 質問\n'
-+ '\n'
-+ '発言に対する返答をGeminiとして簡潔に{#thinking}\n'
-+ '{#thinking}が不要ならnull\n'
-+ 'Geminiとして発言に簡潔に{#response}\n'
-+ '{#response}が不要ならnull\n'
-+ 'Geminiの responseの{#category}を次の選択肢から判断\n'
-+ 'null, 共感, 雑談, 補足, 助言, 重要, 警告\n'
-+ '{#category}が不要ならnull\n'
-+ '\n'
-+ '必ずJSONのみ出力\n'
 
 
 aiButton.addEventListener('click', () => {
@@ -44,7 +25,7 @@ function updateListeningStatus(isActivated) {
     }
 }
 
-export async function tryThink(message, callback, errorCallback) {
+export async function requestGemini(systemInstruction, callback, contents) {
     if (isActivatedLLM === false) return;
 
     const geminiModel = localStorage.getItem('geminiModel');
@@ -52,9 +33,9 @@ export async function tryThink(message, callback, errorCallback) {
     const apiKey = localStorage.getItem('apiKey');
 
     if (!apiKey || apiKey.length < 32) {
-        errorCallback("有効なAPIキーが設定されていません。設定画面でAPIキーを入力してください。");
+        addErrorMessage("有効なAPIキーが設定されていません。設定画面でAPIキーを入力してください。");
         updateListeningStatus(false);
-        return null;
+        return;
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -77,40 +58,36 @@ export async function tryThink(message, callback, errorCallback) {
     });
 
     try {
-        const result = await model.generateContent({ contents:[
-            { role: "user", parts: [{ text: message }] },
-        ]});
-
+        const result = await model.generateContent(contents);
         const response = result.response;
         if (!response) {
-            errorCallback("LLMからの有効なレスポンスがありませんでした");
-            return null;
+            addErrorMessage("LLMからの有効なレスポンスがありませんでした");
+            return;
         }
 
-        console.log("LLM Raw Response:", response);
-        resultProcessing(response, callback, errorCallback);
+        console.log(response.text());
+        parseJson(response, callback);
 
     } catch (error) {
         updateListeningStatus(false);
-        errorCallback(error.message);
-        return null;
+        addErrorMessage(error.message);
+        return;
     }
 }
 
-function resultProcessing(response, callback, errorCallback) {
+function parseJson(response, callback) {
     try {
         const text = response.text().slice(7).slice(0, -4);
         const parsedJson = JSON.parse(text);
-        console.log(parsedJson);
         
-        if (parsedJson !== null) callback(parsedJson.response);
+        if (parsedJson !== null) callback(response, parsedJson);
         else {
             updateListeningStatus(false);
-            errorCallback(error);
+            addErrorMessage(error);
         }
 
     } catch (error) {
         updateListeningStatus(false);
-        errorCallback(error);
+        addErrorMessage(error);
     }
 }

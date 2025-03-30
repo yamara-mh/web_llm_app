@@ -1,4 +1,4 @@
-import { addMessage } from './chat.js';
+import { addUserMessage } from './chat.js';
 
 const micButton = document.getElementById('mic-button');
 const micButtonImage = document.getElementById('mic-button-image');
@@ -42,13 +42,15 @@ recognition.onresult = (event) => {
     const transcript = currentResult[0].transcript;
     messageInput.value = transcript;
     
+    console.log(currentResult);
+    
     if (currentResult.isFinal == false || transcript.length == 0) return;
 
     latestUpdateTime = Date.now();
     setTimeout(function() {
         if (latestUpdateTime <= waitVoiceInputSecond) return;
         
-        addMessage('user', transcript);
+        addUserMessage(transcript);
         messageInput.value = '';
     }, waitVoiceInputSecond);
 };

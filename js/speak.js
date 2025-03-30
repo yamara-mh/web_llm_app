@@ -1,6 +1,6 @@
 const synthesis = window.speechSynthesis;
 
-function speak(text) {
+export function speak(text) {
     const utterance = new SpeechSynthesisUtterance(text);
 
     utterance.voice = speechSynthesis

@@ -43,7 +43,7 @@ waitVoiceInputSlider.addEventListener('input', () => {
 
 // 合成音声
 function populateVoiceList() {
-    const voices = synthesis.getVoices();
+    const voices = window.speechSynthesis.getVoices();
     const savedIndex = localStorage.getItem('voiceIndex') || voices.indexOf(voices.find(voice => voice.lang === window.navigator.browserLanguage));
 
     for (let i = 0; i < voices.length; i++) {
@@ -56,8 +56,8 @@ function populateVoiceList() {
     }
     speakVoiceSelect.selectedIndex = savedIndex;
 }
-if (synthesis.onvoiceschanged !== undefined) {
-    synthesis.onvoiceschanged = populateVoiceList;
+if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = populateVoiceList;
 }
 populateVoiceList()
 
