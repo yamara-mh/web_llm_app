@@ -5,54 +5,25 @@ const aiButtonImage = document.getElementById('ai-button-image');
 
 var isActivatedLLM = false;
 
-const systemInstruction = "あなたは自律型AIアシスタント。\n"
-+ "簡潔な水平思考で冷静に振る舞う。";
-
-const schema = {
-    type: SchemaType.OBJECT,
-    properties: {
-        reasoning: {
-            type: SchemaType.STRING,
-            description: '発言の経緯を reasoning',
-            nullable: false,
-        },
-        target: {
-            type: SchemaType.STRING,
-            description: '話しかけた targetを予想',
-            enum: ['null', '話者自身', '物や動物など', '誰か', 'Geminiかも', '#Gemini'],
-            nullable: false,
-        },
-        type: {
-            type: SchemaType.STRING,
-            description: '発言の type',
-            enum: ['ひとりごと', '擬人語り', '日常会話', '議論', '相談', '疑問', '質問'],
-            nullable: false,
-        },
-        support: {
-            type: SchemaType.STRING,
-            description: '発言の responseをGeminiとして思考',
-            nullable: true,
-        },
-        response: {
-            type: SchemaType.STRING,
-            description: 'Geminiの response',
-            nullable: true,
-        },
-        category: {
-            type: SchemaType.STRING,
-            description: 'Geminiの responseの category',
-            enum: ['null', '共感', '雑談', '補足', '助言', '重要', '警告'],
-            nullable: true,
-        },
-        next_temperature: {
-            type: SchemaType.NUMBER,
-            description: '次の responseの創造性。範囲は0.0から1.0',
-            nullable: false,
-        }
-    },
-    required: ['reasoning', 'target', 'type', 'next_temperature'],
-    propertyOrdering: ['reasoning', 'target', 'type', 'support', 'response', 'category', 'next_temperature'],
-};
+const systemInstruction = 'あなたは自律型AIアシスタント\n'
++ '水平思考で冷静に振る舞う\n'
+* 'JSONで出力\n'
++ '発言の経緯を簡潔に{#reasoning}\n'
++ '話しかけた{#target}を次の選択肢から予想\n'
++ 'null, 話者自身, 物や動物など, 誰か, Geminiかも, #Gemini\n'
++ '\n'
++ '発言の{#type}を次の選択肢から予想\n'
++ 'ひとりごと, 擬人語り, 日常会話, 議論, 相談, 疑問, 質問\n'
++ '\n'
++ '発言に対する返答をGeminiとして簡潔に{#thinking}\n'
++ '{#thinking}が不要ならnull\n'
++ 'Geminiとして発言に簡潔に{#response}\n'
++ '{#response}が不要ならnull\n'
++ 'Geminiの responseの{#category}を次の選択肢から判断\n'
++ 'null, 共感, 雑談, 補足, 助言, 重要, 警告\n'
++ '{#category}が不要ならnull\n'
++ '\n'
++ '必ずJSONのみ出力\n'
 
 
 aiButton.addEventListener('click', () => {
@@ -91,10 +62,8 @@ export async function tryThink(message, callback, errorCallback) {
         model: geminiModel + latestSuffix,
         systemInstruction: systemInstruction,
         generationConfig: {
-            responseMimeType: 'application/json',
-            responseSchema: schema,
             maxOutputTokens: 1000,
-            temperature: 0, // 創造性（会話の流れで変動するようにする？）
+            temperature: 0,
         },
         tools: [{
             googleSearchRetrieval: {
@@ -130,11 +99,15 @@ export async function tryThink(message, callback, errorCallback) {
 
 function resultProcessing(response, callback, errorCallback) {
     try {
-        const text = response.text();
+        const text = response.text().slice(7).slice(0, -4);
         const parsedJson = JSON.parse(text);
-        console.log("Parsed JSON:", parsedJson);
-
-        if (parsedJson.response !== null) callback(parsedJson.response);
+        console.log(parsedJson);
+        
+        if (parsedJson !== null) callback(parsedJson.response);
+        else {
+            updateListeningStatus(false);
+            errorCallback(error);
+        }
 
     } catch (error) {
         updateListeningStatus(false);

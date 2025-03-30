@@ -55,6 +55,7 @@ recognition.onresult = (event) => {
 
 recognition.onend = () => {
     if (isListening) recognition.start();
+    else UpdateListeningStatus(false);
 };
 
 // エラーハンドリング
