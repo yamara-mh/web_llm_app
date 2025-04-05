@@ -5,11 +5,12 @@ const micButtonImage = document.getElementById('mic-button-image');
 const messageInput = document.getElementById('message-input');
 const messageToast = document.getElementById('message-toast');
 
-const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 
 var isListening = false;
 var latestUpdateTime = 0;
 var waitVoiceInputSecond;
+var resultCount = 0;
 
 micButton.addEventListener('click', () => {
     isListening = !isListening;
@@ -23,8 +24,9 @@ function updateLLMStatus(isListeningFlag) {
         
         recognition.lang = localStorage.getItem('speechLanguage');
         recognition.continuous = true;
-        recognition.interimResults = true;
         recognition.start();
+
+        waitVoiceInputSecond = localStorage.getItem('waitVoiceInput');
     }
     else
     {
@@ -37,23 +39,25 @@ function updateLLMStatus(isListeningFlag) {
 
 // 音声認識の結果を受け取るイベント
 recognition.onresult = (event) => {
-    const currentResult = event.results[event.results.length - 1];
     
-    const transcript = currentResult[0].transcript;
-    messageInput.value = transcript;
-    
-    console.log(currentResult);
-    
-    if (currentResult.isFinal == false || transcript.length == 0) return;
+    let finalTranscript = '';
+    let interimTranscript = '';
 
-    latestUpdateTime = Date.now();
-    setTimeout(function() {
-        if (latestUpdateTime <= waitVoiceInputSecond) return;
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+        const results = event.results;
+        const transcript = results[i][0].transcript;
+        console.log(resultCount, transcript, results[i].isFinal);
         
-        addUserMessage(transcript);
-        messageInput.value = '';
-    }, waitVoiceInputSecond);
-};
+        if (results[i].isFinal) {
+            finalTranscript += transcript;
+        } else {
+            interimTranscript = transcript;
+        }
+    }
+
+    addUserMessage(finalTranscript + interimTranscript);
+    finalTranscript = '';
+}
 
 recognition.onend = () => {
     if (isListening) recognition.start();
