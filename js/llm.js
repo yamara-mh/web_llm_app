@@ -25,7 +25,7 @@ function updateListeningStatus(isActivated) {
     }
 }
 
-export async function requestGemini(systemInstruction, callback, contents) {
+export async function requestGemini(callback, contents) {
     if (isActivatedLLM === false) return;
 
     const geminiModel = localStorage.getItem('geminiModel');
@@ -41,7 +41,6 @@ export async function requestGemini(systemInstruction, callback, contents) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
         model: geminiModel + latestSuffix,
-        systemInstruction: systemInstruction,
         generationConfig: {
             maxOutputTokens: 1000,
             temperature: 0,

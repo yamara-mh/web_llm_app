@@ -8,15 +8,12 @@ const messageToast = document.getElementById('message-toast');
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 
 var isListening = false;
-var latestUpdateTime = 0;
-var waitVoiceInputSecond;
-var resultCount = 0;
 
 micButton.addEventListener('click', () => {
     isListening = !isListening;
-    updateLLMStatus(isListening);
+    updateListeningStatus(isListening);
 });
-function updateLLMStatus(isListeningFlag) {
+function updateListeningStatus(isListeningFlag) {
     if (isListeningFlag) {
         micButton.classList.remove('btn-secondary');
         micButton.classList.add('btn-primary');
@@ -39,29 +36,12 @@ function updateLLMStatus(isListeningFlag) {
 
 // 音声認識の結果を受け取るイベント
 recognition.onresult = (event) => {
-    
-    let finalTranscript = '';
-    let interimTranscript = '';
-
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-        const results = event.results;
-        const transcript = results[i][0].transcript;
-        console.log(resultCount, transcript, results[i].isFinal);
-        
-        if (results[i].isFinal) {
-            finalTranscript += transcript;
-        } else {
-            interimTranscript = transcript;
-        }
-    }
-
-    addUserMessage(finalTranscript + interimTranscript);
-    finalTranscript = '';
+    addUserMessage(event.results[event.resultIndex][0].transcript);
 }
 
 recognition.onend = () => {
     if (isListening) recognition.start();
-    else UpdateListeningStatus(false);
+    else updateListeningStatus(false);
 };
 
 // エラーハンドリング
